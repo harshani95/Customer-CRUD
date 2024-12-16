@@ -1,12 +1,17 @@
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.cfg.Configuration;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AppInitializer {
     public static void main(String[] args) {
-        //save
+
         try{
-            Customer customer = new Customer(1001, "Kamal Perera", "Colombo", 30000, "2020-8-23");
+            Customer customer = new Customer(1001, "Kamal", "Colombo", 30000, "2020-8-23");
             if (saveCustomer(customer)){
                 System.out.println("success!");
             }else{
@@ -15,11 +20,9 @@ public class AppInitializer {
         }
         catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
-
         }
-        //save
 
-        //find by id
+
         try{
             Customer customer = findById(1001);
             if (customer!=null){
@@ -31,11 +34,9 @@ public class AppInitializer {
         }
         catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
-
         }
-        //find by id
 
-        //find all
+
         try{
           List<Customer> customers = findAll();
             if (!customers.isEmpty()){
@@ -50,13 +51,11 @@ public class AppInitializer {
         }
         catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
-
         }
-        //find all
 
-        //update
+
         try{
-            Customer customer = new Customer(1001, "Sunil Perera", "Colombo", 40000, "2020-10-23");
+            Customer customer = new Customer(1001, "Sunil", "Colombo", 40000, "2020-10-23");
             if (updateCustomer(customer)){
                 System.out.println("success!");
             }else{
@@ -65,11 +64,9 @@ public class AppInitializer {
         }
         catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
-
         }
-        //update
 
-        //delete
+
         try{
 
             if (deleteCustomer(1001)){
@@ -81,21 +78,21 @@ public class AppInitializer {
         catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-        //delete
 
     }
 
 
     private static boolean saveCustomer(Customer c) throws ClassNotFoundException, SQLException {
 
-            String sql = "INSERT INTO customer VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
-            preparedStatement.setLong(1,c.getId());
-            preparedStatement.setString(2,c.getName());
-            preparedStatement.setString(3,c.getAddress());
-            preparedStatement.setDouble(4,c.getSalary());
-            preparedStatement.setObject(5,c.getDate());
-            return preparedStatement.executeUpdate()>0;
+        Configuration configuration = new Configuration().configure("hibernate.cfg.xml").addAnnotatedClass(Customer.class);
+        SessionFactory sessionFactory = configuration.buildSessionFactory();
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.save(c);
+        transaction.commit();
+        session.close();
+        sessionFactory.close();
+        return true;
         }
 
     private static Customer findById(long id) throws ClassNotFoundException, SQLException {
