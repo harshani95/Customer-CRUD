@@ -1,3 +1,3 @@
-## Customer CRUD
+## Customer CRUD Application
 - hibernate
 - MySQL
